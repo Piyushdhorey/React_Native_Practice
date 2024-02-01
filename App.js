@@ -1,31 +1,39 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Pressable } from 'react-native';
 import { useState } from 'react';
+import GoalItem from './components/GoalItem';
+import GoalInput from './components/GoalInput';
 
 export default function App() {
   
-  const [enteredGoalText, setEnteredGoalText] = useState('')
   const [courseGoals, setCourseGoals] = useState([])
 
-  function goalInputHandler(enteredText) {
-    setEnteredGoalText(enteredText)
+  function addGoalHandler(enteredGoalText) {
+    setCourseGoals((currentCourseGoals) => [...currentCourseGoals, {text: enteredGoalText , id: Math.random().toString()}])
   }
-  function addGoalHandler() {
-    setCourseGoals((currentCourseGoals) => [...currentCourseGoals, enteredGoalText])
+
+  function deleteGoalHandler(id) {
+    setCourseGoals((currentCourseGoals) => {
+      return currentCourseGoals.filter((goal) => goal.id != id)
+    })
   }
 
   return (
     <View style = {styles.appContainer}>
-      <View style = {styles.inputContainer}>
-        <TextInput style = {styles.textInput} placeholder='Your course goal' onChangeText={goalInputHandler}/>
-        <Button title='Add Goal' onPress={addGoalHandler}/>
-      </View>
+      <GoalInput onAddGoal={addGoalHandler}/>
       <View style = {styles.goalsContainer}>
         <Text style = {styles.textHeading}>List of Goals</Text>
-        {courseGoals.map((goal) => <Text key={goal} style = {styles.textGoals}>{goal}</Text>)}
+        <FlatList data={courseGoals} renderItem={(itemData) => {
+          return (
+            <GoalItem text ={itemData.item.text} id= {itemData.item.id}onDeleteItem = {deleteGoalHandler} />
+          )
+        }} keyExtractor={(item, index) => {
+          return item.id
+        }}>
+        </FlatList>
       </View>
       {/* <Text>Hello World! Piyush...</Text>
-      <View>
+      <View2
         <Text style = {styles.newStyle}>Another Hello World! Not Piyush</Text>
       </View3
       <Button title="Don't Tap Me"></Button>
@@ -43,29 +51,8 @@ const styles = StyleSheet.create({
     marginTop: 16,
   
   },
-  inputContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#cccccc'
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#cccccc',
-    width: '70%',
-    marginRight: 10,
-    padding: 5
-  },
   goalsContainer: {
     flex: 5
-  },
-  textGoals: {
-    fontStyle: 'italic',
-    fontSize: 24,
-    marginTop: 10
   },
   textHeading: {
     fontSize: 20
